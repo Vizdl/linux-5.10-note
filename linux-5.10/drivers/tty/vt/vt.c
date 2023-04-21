@@ -2896,7 +2896,7 @@ static int do_con_write(struct tty_struct *tty, const unsigned char *buf, int co
 rescan_last_byte:
 		c = orig;
 		rescan = false;
-
+		/* 编码转换 */
 		tc = vc_translate(vc, &c, &rescan);
 		if (tc == -1)
 			continue;
@@ -3566,7 +3566,7 @@ int __init vty_init(const struct file_operations *console_fops)
 		tty0dev = NULL;
 
 	vcs_init();
-
+	// /dev/tty1 - /dev/ttyn
 	console_driver = alloc_tty_driver(MAX_NR_CONSOLES);
 	if (!console_driver)
 		panic("Couldn't allocate console driver\n");

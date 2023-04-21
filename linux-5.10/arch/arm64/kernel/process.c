@@ -397,8 +397,9 @@ int copy_thread(unsigned long clone_flags, unsigned long stack_start,
 	fpsimd_flush_task_state(p);
 
 	ptrauth_thread_init_kernel(p);
-
+	/* 如若是用户态 */
 	if (likely(!(p->flags & PF_KTHREAD))) {
+		/* 拷贝寄存器状态组 */
 		*childregs = *current_pt_regs();
 		childregs->regs[0] = 0;
 
