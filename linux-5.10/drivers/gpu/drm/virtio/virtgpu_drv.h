@@ -225,6 +225,7 @@ struct virtio_gpu_device {
 
 struct virtio_gpu_fpriv {
 	uint32_t ctx_id;
+	// 是否已创建 ctx
 	bool context_created;
 	struct mutex context_lock;
 };

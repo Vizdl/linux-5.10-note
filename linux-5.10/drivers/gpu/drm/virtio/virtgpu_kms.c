@@ -94,6 +94,9 @@ static void virtio_gpu_get_capsets(struct virtio_gpu_device *vgdev,
 	vgdev->num_capsets = num_capsets;
 }
 
+/**
+ * 初始化 drm 设备驱动
+ */
 int virtio_gpu_init(struct drm_device *dev)
 {
 	static vq_callback_t *callbacks[] = {
@@ -110,10 +113,16 @@ int virtio_gpu_init(struct drm_device *dev)
 	if (!virtio_has_feature(dev_to_virtio(dev->dev), VIRTIO_F_VERSION_1))
 		return -ENODEV;
 
+	/**
+	 * 申请 virtio gpu 设备 内存
+	 */
 	vgdev = kzalloc(sizeof(struct virtio_gpu_device), GFP_KERNEL);
 	if (!vgdev)
 		return -ENOMEM;
 
+	/**
+	 * 初始化 virtio gpu 设备
+	 */
 	vgdev->ddev = dev;
 	dev->dev_private = vgdev;
 	vgdev->vdev = dev_to_virtio(dev->dev);
@@ -186,6 +195,9 @@ int virtio_gpu_init(struct drm_device *dev)
 			num_capsets, &num_capsets);
 	DRM_INFO("number of cap sets: %d\n", num_capsets);
 
+	/**
+	 * 初始化 modeset
+	 */
 	ret = virtio_gpu_modeset_init(vgdev);
 	if (ret) {
 		DRM_ERROR("modeset init failed\n");

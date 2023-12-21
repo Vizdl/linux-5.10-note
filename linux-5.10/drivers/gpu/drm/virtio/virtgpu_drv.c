@@ -94,6 +94,9 @@ static int virtio_gpu_pci_quirk(struct drm_device *dev, struct virtio_device *vd
 	return drm_dev_set_unique(dev, unique);
 }
 
+/**
+ * probe virtio gpu
+ */
 static int virtio_gpu_probe(struct virtio_device *vdev)
 {
 	struct drm_device *dev;
@@ -105,6 +108,10 @@ static int virtio_gpu_probe(struct virtio_device *vdev)
 	if (virtio_gpu_modeset == 0)
 		return -EINVAL;
 
+	/**
+	 * 申请 drm 设备所需内存
+	 * 并利用 drm 驱动初始化设备
+	 */
 	dev = drm_dev_alloc(&driver, &vdev->dev);
 	if (IS_ERR(dev))
 		return PTR_ERR(dev);
@@ -116,14 +123,23 @@ static int virtio_gpu_probe(struct virtio_device *vdev)
 			goto err_free;
 	}
 
+	/**
+	 * 初始化 drm 设备
+	 */
 	ret = virtio_gpu_init(dev);
 	if (ret)
 		goto err_free;
 
+	/**
+	 * 注册 drm 设备
+	 */
 	ret = drm_dev_register(dev, 0);
 	if (ret)
 		goto err_free;
 
+	/**
+	 * 安装 drm 设备
+	 */
 	drm_fbdev_generic_setup(vdev->priv, 32);
 	return 0;
 

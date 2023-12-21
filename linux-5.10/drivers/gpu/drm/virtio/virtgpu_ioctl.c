@@ -146,7 +146,9 @@ static int virtio_gpu_execbuffer_ioctl(struct drm_device *dev, void *data,
 		kvfree(bo_handles);
 		bo_handles = NULL;
 	}
-
+	/**
+	 * 内存拷贝
+	 */
 	buf = vmemdup_user(u64_to_user_ptr(exbuf->command), exbuf->size);
 	if (IS_ERR(buf)) {
 		ret = PTR_ERR(buf);
@@ -158,13 +160,13 @@ static int virtio_gpu_execbuffer_ioctl(struct drm_device *dev, void *data,
 		if (ret)
 			goto out_memdup;
 	}
-
+	// 创建 fence
 	out_fence = virtio_gpu_fence_alloc(vgdev);
 	if(!out_fence) {
 		ret = -ENOMEM;
 		goto out_unresv;
 	}
-
+	// 将 fence 与文件绑定
 	if (out_fence_fd >= 0) {
 		sync_file = sync_file_create(&out_fence->f);
 		if (!sync_file) {
@@ -179,6 +181,7 @@ static int virtio_gpu_execbuffer_ioctl(struct drm_device *dev, void *data,
 
 	virtio_gpu_cmd_submit(vgdev, buf, exbuf->size,
 			      vfpriv->ctx_id, buflist, out_fence);
+	// 设置 fence
 	dma_fence_put(&out_fence->f);
 	virtio_gpu_notify(vgdev);
 	return 0;
